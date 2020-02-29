@@ -4,6 +4,7 @@ source("Scripts/keys.r")
 get_token()
 
 # Pull keywords from CSV for easy editing
+library(tidyverse)
 search_terms<-read_csv("Data/keywords.csv",col_names=FALSE) %>% pull %>% paste(collapse=",")
 
 # Set your preferred timeout
