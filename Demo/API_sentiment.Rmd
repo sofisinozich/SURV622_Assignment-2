@@ -1,0 +1,388 @@
+---
+title: "An Introduction to the Twitter API and Sentiment Analysis"
+author: "Robyn Ferg"
+date: "February 24, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(cache=TRUE, warning=FALSE, message=FALSE)
+```
+
+
+# rtweet
+** Demonstration is adapted from rtweet documentation - https://github.com/mkearney/rtweet **
+
+##Loading rtweet
+First, run this code to install and load the library, rtweet.  
+
+NOTE: You will also need a Twitter account to run this code.
+
+```{r}
+#install.packages('rtweet')
+library(rtweet)
+```
+
+## search_tweets
+Firstly, we can use the Twitter search API to pull previously tweeted tweets - this function behaves the same as doing a search in the twitter search bar, returns a bunch of variables in a JSON format and then rtweet turns it into a dataframe for us.
+
+In this example, we're searching for tweets that include the hashtag #rstats, and limiting our results to 100 maximum. The include_rts argument indicates whether or not you want your results to include retweets.  In this example we have set that to FALSE, so we would only get original tweets.  Search_tweets using the standard Twitter API (the free version) will only pull historical tweets within the past week.
+
+As you work through this notebook, if you run each cell in rapid succession you may hit a rate limit.  You can only collect 18,000 tweets per 15 minutes.  If I hit a rate limit I set a timer for 15 minutes and work on something else in the meantime.  I'm going to limit many of these examples to 100 tweets each to avoid hitting rate limits.
+
+```{r cache=TRUE}
+rstats = search_tweets("#rstats", n = 100, include_rts = FALSE)
+```
+
+Tweets from the last 6-9 days are collected, lets look at a 10.
+
+```{r}
+head(rstats$text, n=10)
+```
+
+In search_tweets we can use AND to find tweets that contain both #rstats AND the word data, in any position within the text. The space works as an AND search.
+
+```{r}
+rstats2 = search_tweets("#rstats data", n = 100, include_rts = FALSE)
+```
+Here we find tweets that contain both #rstats and also the word data.
+```{r}
+head(rstats2$text, n=10)
+```
+
+Let's try an OR instead of an AND search. See the twitter search documentation for standard search operators: https://developer.twitter.com/en/docs/tweets/search/guides/standard-operators
+
+```{r}
+rstats3 = search_tweets("#rstats OR data", n = 100, include_rts = FALSE)
+```
+
+Here we find more variety of tweets as they contain either #rstats or the fairly common word "data."
+```{r}
+head(rstats3$text, n=10)
+```
+
+## Variables in Twitter Data
+```{r}
+# LIST VARIABLE NAMES
+colnames(rstats)
+```
+
+## What are retweets?  
+So far we've limited our tweets obtained in our searches to original tweets by utilizing the `include_rts = FALSE` argument. What are retweets?  Retweets are probably the most common type of tweet on twitter.  Retweets are when users share the tweets of others on their own twitter timeline with attribution.
+
+## Using Collected Tweet Data - Tweets over Time
+We can make various plots using this saved data, for example, graphing the number of tweets by timeperiod.
+
+```{r warning=FALSE, message=FALSE}
+#install.packages('ggplot2')
+library(ggplot2)
+```
+
+```{r warning=FALSE}
+ts_plot(rstats, "1 hours") +
+  ggplot2::theme_minimal() +
+  ggplot2::theme(plot.title = ggplot2::element_text(face = "bold")) +
+  ggplot2::labs(
+    x = NULL, y = NULL,
+    title = "Frequency of #rstats Twitter statuses",
+    subtitle = "Twitter status (tweet) counts aggregated using one-hour intervals",
+    caption = "\nSource: Data collected from Twitter's REST API via rtweet"
+  ) 
+```
+
+
+# "Listening" to Twitter
+
+## stream_tweets
+So far we have done our analysis on past tweets through the search API.  For most research applications you will want to "listen" to the twitter stream and obtain a 1% sample of all tweets as they are posted, 1) because you can monitor emerging situations and 2) because with a free account you are limited to searching the last 6-9 days, but you can stream continuously over a period of time to compile a corpus of tweets for analysis.  You will likely obtain more tweets when streaming vs. searching, but streaming API doesn't have as many operators to be used in keywords - search_tweets has options for NOT searches, types of media (containing an image or a periscope). You also cannot exclude retweets easily when streatming.
+
+The most basic is obtaining a random sample, using no filters. We specify rtweet to listent for 10 seconds (The timeout argument is in seconds). rtweet will default to 30 seconds unless otherwise specified.
+```{r cache=TRUE}
+library(rtweet)
+st = stream_tweets(timeout=10, parse=TRUE)
+```
+
+## What do the tweets say?
+```{r cache=TRUE}
+#PRINT TEXT OF LAST 10 TWEETS IN TABLE
+tail(st$text, n=10)
+```
+Some of what you receive in the text might look like gibberish. These tweets may need to be cleaned before performing text analysis.
+
+##Filtering the Stream
+You can also listen for specific filter items (search terms).  
+
+With the Deomcratic primary coming up, we'll listen for tweets about Joe Biden, Bernie Sanders, Elizabeth Warren, and Pete Buttigeig. We will listen for 10 seconds again.  The comma serves as an "OR" search.  This will not find tweets that call Elizabeth Warren "Warren" or "Sen. Warren," it requires both Elizabeth AND Warren.
+
+```{r cache=TRUE}
+demCandidates = stream_tweets("joe biden, bernie sanders, elizabeth warren, pete buttigieg", timeout = 10)
+```
+
+## What do our Democratic candidate tweets say?
+```{r}
+#PRINT TEXT OF FIRST 10 TWEETS IN TABLE
+head(demCandidates$text, n=10)
+```
+Remember this is ~1% of all tweets about either of the four candidates within a 10 second period.
+
+Note that it includes tweets about Joe Biden OR Bernie Sanders OR Elizabeth Warren OR Pete Buttigeig.  The comma in the keyword string serves as an OR search.
+
+FROM THE TWITTER API DOCUMENTATION:
+"A comma-separated list of phrases which will be used to determine what Tweets will be delivered on the stream. A phrase may be one or more terms separated by spaces, and a phrase will match if all of the terms in the phrase are present in the Tweet, regardless of order and ignoring case. By this model, you can think of commas as logical ORs, while spaces are equivalent to logical ANDs (e.g. 'the twitter' is the AND twitter, and 'the,twitter' is the OR twitter)."
+Standard stream parameters available at https://developer.twitter.com/en/docs/tweets/filter-realtime/guides/basic-stream-parameters.html.  Scroll down to the section titled "track."
+
+Instead, we want to get tweets that include Joe Biden AND Bernie Sanders AND Elizabeth Warren AND Pete Buttigieg and allow for not including first names.  This time we'll save the tweets in raw JSON format inside your working directory.  Afterwards we'll parse the JSON file using a different function, parse_stream, to convert to a data frame.
+
+```{r cache=TRUE}
+stream_tweets(
+  "biden sanders warren buttigieg", 
+  timeout = 30,
+  parse=FALSE,#parse= FALSE to save as raw JSON
+  file_name = "tweets"
+) 
+```
+```{r}
+demCandidates_all = parse_stream("tweets.json")
+```
+
+## What do our Biden AND Sanders AND Warren AND Buttigieg tweets say?
+There are fewer tweets containing Trump AND Stone.  Again a 1% sample of the universe of tweets in a short period.
+```{r}
+#PRINT TEXT OF FIRST 10 TWEETS
+head(demCandidates_all$text, n=10)
+```
+Note 2 things - 1) The search terms could be contained in quoted tweet not necessarily in the message added by the user who quoted or retweeted, 2) some of the tweets appear to be truncated.  Only RTs or tweets with embedded quoted tweets should be truncated, and the quoted tweets or tweets that are being retweeted are included in the variables quoted_text and retweet_text, so all text is included.
+
+```{r}
+print("TWEET TEXT")
+head(demCandidates_all$text, n=5)
+print("RETWEET TEXT")
+head(demCandidates_all$retweet_text, n=5)
+print("QUOTE TWEET TEXT")
+head(demCandidates_all$quoted_text, n=5)
+```
+
+##Listening Over Time
+Here is example code for the listening you will be doing for your project.  In the "q" variable you will list your keywords for your searches, using spaces for AND and commas for OR. For you assignment you will want to collected tweets related to basketball, so you will need to change the query to words such as 'Michigan basketball', 'basketball #goblue', etc.
+
+IMPORTANT: If you're going to leave your computer on to run this over time, make sure to set your power and sleep settings so that the PC will not go to sleep.  If it does, your code will stop and you will lose data and have to restart it.
+```{r eval=TRUE, cache=TRUE}
+## Stream keywords used to filter tweets
+q = "joe biden, joebiden, bernie sanders, berniesanders, elizabeth warren, ewarren, pete buttigieg, petebuttigieg"  
+## Put your selected filter terms here ^^^^,separated by commas.  
+## The commas serve as an OR search. Spaces, as in "joe biden" serve as an AND search 
+## where both items need to appear in the same tweet, but not necessarily next to each other.
+## NOTE -joebiden and joe biden do not return the same results.
+
+## Stream time in seconds so for one minute set timeout = 60
+## For larger chunks of time, I recommend multiplying 60 by the number
+## of desired minutes. This method scales up to hours as well
+## (x * 60 = x mins, x * 60 * 60 = x hours)
+
+# timeout =  60 * 60 * 24  # timeout for one day
+timeout = 30 # timeout for 30 seconds
+
+## Monitor your progress, you may have to restart your code if the internet blips or
+## if your computer restarts.  By not parsing and saving the raw JSON, you should hopefully not lose any data.
+
+stream_tweets(
+  q,
+  parse = FALSE,
+  timeout = timeout,
+  file_name = "tweets1")
+stream_tweets(
+  q,
+  parse = FALSE,
+  timeout = timeout,
+  file_name = "tweets2")
+```
+
+##Parsing JSONS and appending dataframes
+```{r eval=TRUE}
+## Parse from json file to get a usable dataframe
+tweets1 = parse_stream("tweets1.json") #replace tweets1 with the name of the json file
+tweets2 = parse_stream("tweets2.json") #check your folder and see how many stream files you have, parse each into a separate dataframe, then bind using the code below, adding each df name to the rbind function
+all_tweets = rbind(tweets1, tweets2)
+```
+
+## Monitor Your Output
+You may want to use a series of shorter listening times (such as 1 day) and at the end of each day inspect the tweets you've received for trends so that you can add any emerging hashtags to your filter terms.
+
+## Very Basic Text Mining - Bag of Words
+To see what popular terms are in your collected tweets, we'll use a text mining package, qdap, to look at frequent terms.  For this example I'm using the Donald Trump tweets from before.  Qdap will require you to have Java installed on your computer matching (32-bit vs. 64-bit) your version of R. If you get an error when loading qdap, Get the right version of Java at https://www.java.com/en/download/manual.jsp.
+
+```{r}
+#install.packages('qdap')
+library(qdap)
+```
+
+## The Bag of Democratic Candidate Words
+```{r}
+frequent_terms = freq_terms(all_tweets["text"], 30)
+plot(frequent_terms)
+```
+
+Some of the words are expected, we streamed for tweets about the top four Democratic candidates - so their names are likely to be in the top words. Note that this is counting the number of times these words appear, not the number of tweets in which these words appear.  If "Warren" is in one tweet 3 times, it adds 3 instances of "Warren" to the totals reflected above.
+
+We also get words that don't mean much to us, like the, to, a, etc.  These are typically called stopwords. Let's remove these.
+```{r}
+bagCandidates = all_tweets$text %>% iconv("latin1", "ASCII", sub="") %>% scrubber() %sw% qdapDictionaries::Top200Words
+```
+
+And now look at the frequent terms again.
+```{r}
+frequent_terms = freq_terms(bagCandidates, 30)
+plot(frequent_terms)
+```
+
+With the South Carolina primary coming up, let's say we're interested in tweets regarding South Carolina. To further analyze those tweets, I could create a dataframe that just includes tweets with the words "South Carolina".
+```{r warning=FALSE, message=FALSE, cache=TRUE}
+#install.packages('dplyr')
+#install.packages("stringr")
+
+library(dplyr)
+library(stringr)
+```
+```{r}
+candidates_sc = all_tweets%>%filter(str_detect(str_to_lower(text), "south carolina") == TRUE)
+head(candidates_sc$text, n=10)
+```
+
+# Sentiment Analysis
+
+Now that we have our corpus of tweets from the Twitter API, we can perform a sentiment analysis. We will focus on the `all_tweets' dataset from above.
+
+## Filtering Out Irrelevant Tweets
+
+There will often be tweets that are not relevant to the analysis at hand. For example, since one of our search words was 'Warren', the Twitter API could have given us tweets about Warren Buffet instead of Elizabeth Warren. For the purposes of the primary, Warren Buffet is largely irrelevant, so we want to remove all tweets with the word 'Buffet'. In the assignment if you want to remove that are about, for example, basketball and hockey, you would change the irrelevant words to: irrelevantWords=c('basketball', 'hockey').
+
+```{r, cache=TRUE}
+#install.packages('quanteda')
+library(quanteda)
+
+irrelevantWords = c('buffet')
+
+newTweets = data.frame()
+irrelevantTweets = data.frame()
+
+for(i in 1:nrow(all_tweets)){
+  # break up tweet into indiviaul words
+  tweet = all_tweets$text[i]
+  tweet = tolower(tweet)
+  words = tokens(tweet)
+  # if it contains an irrelevant word, put it in the irrelevant data frame
+  if(length(intersect(words$text1, irrelevantWords))>0){
+    irrelevantTweets = rbind(irrelevantTweets, all_tweets[i,])
+  }
+  else{
+    newTweets = rbind(newTweets, all_tweets[i,])
+  }
+}
+```
+
+## Sentiment Calculation
+
+To calculate the sentiment of tweets we will be using dictionary-based methods. The first four dictionaries are included in the 'SentimentAnalysis' package.
+
+```{r, cache=TRUE}
+# install.packages('SentimentAnalysis')
+library(SentimentAnalysis)
+```
+
+The four dictionaries are:
+
+GI-- Harvard-IV General Inquirer dictionary
+
+HE-- Henry's finance specific dictionary
+
+LM-- Loughran-McDonald financial dictionary
+QDAP
+
+More detail on this package can be found at: https://cran.r-project.org/web/packages/SentimentAnalysis/SentimentAnalysis.pdf
+
+To see the words in one of these packages:
+```{r, cache=TRUE}
+data('DictionaryGI')
+DictionaryGI$positive[1:100]
+DictionaryGI$negative[1:100]
+```
+
+The fifth dictionary is Lexicoder, which consists of word lists for positive, negative, negated positive, and negated negative words.
+
+```{r, cache=TRUE}
+data_dictionary_LSD2015$negative[1:100]
+data_dictionary_LSD2015$positive[1:100]
+data_dictionary_LSD2015$neg_positive[1:100]
+data_dictionary_LSD2015$neg_negative[1:100]
+```
+
+To calculate sentiment of each tweet using the 'SentimentAnalysis' package:
+
+```{r, cache=TRUE}
+sentiments = analyzeSentiment(iconv(as.character(newTweets$text), to='UTF-8'))
+head(sentiments)
+```
+
+The variables are:
+
+WordCount = number of non-stopwords in the tweet
+
+NegativityGI = number of negative words in the tweet that are in the GI negative dictionary / WordCount
+
+PositivityGI = number of negative words in the tweet that are in the GI positive dictionary / WordCount
+
+SentimentGI = PositivityGI - NegativityGI = (# positive words - # negative words) / WordCount
+
+HE, LM, QDAP are similar
+
+When using Lexicoder, we calculate
+
+number of positive words = positive words - negated positive + negated negative
+
+number of negative words = negative words - negated negative + negated positive
+
+```{r, echo=TRUE}
+tokenized=tokens_lookup(tokens(newTweets$text), dictionary=data_dictionary_LSD2015, exclusive=FALSE)
+sentiments$LCpos = sapply(tokenized, function(x) sum(x=='POSITIVE') - sum(x=='NEG_POSITIVE') + sum(x=='NEG_NEGATIVE'))
+sentiments$LCneg = sapply(tokenized, function(x) sum(x=='NEGATIVE') - sum(x=='NEG_NEGATIVE') + sum(x=='NEG_POSITIVE'))
+sentiments$LC = (sentiments$LCpos-sentiments$LCneg)/sentiments$WordCount
+```
+
+To see how the dictionaries compare to each other:
+```{r, cache=TRUE}
+#install.packages('GGally')
+library(GGally)
+ggpairs(data.frame(sentiments$SentimentGI, sentiments$SentimentHE, sentiments$SentimentLM, 
+                   sentiments$SentimentQDAP, sentiments$LC))
+```
+
+## Sentiment Change Over Time
+
+On the graph below, the x-axis is the time and date the tweet was sent, and the y-axis is the sentiment of the tweet. Since the tweets used were gathered in the time span of one minutes, the x-axis is the second that each tweet was sent. 
+
+```{r, cache=TRUE}
+ggplot(data=data.frame(time=newTweets$created_at, sentiment=sentiments$SentimentGI), aes(x=time, y=sentiment)) + geom_point() + geom_smooth() 
+```
+
+There does not appear to be much of a trend in sentiment of our tweets. Our tweets were collected over a very short timespan; tweets collected over a longer timespan may show more of a pattern.
+
+## Sentiment of retweets vs. original tweets
+```{r, cache=TRUE}
+par(mfrow=c(1,2))
+hist(sentiments$SentimentGI[newTweets$is_retweet==TRUE], main='Sentiment of Retweets', xlab='Sentiment')
+hist(sentiments$SentimentGI[newTweets$is_retweet==FALSE], main='Sentiment of Original Tweets', xlab='Sentiment')
+par(mfrow=c(1,1))
+```
+
+```{r}
+mean(sentiments$SentimentGI[newTweets$is_retweet==TRUE], na.rm=TRUE)
+mean(sentiments$SentimentGI[newTweets$is_retweet==FALSE], na.rm=TRUE)
+```
+
+## Are longer tweets more positive or negative?
+
+In the plot below, the shade of the point refers to how many tweets are at that location. We do not see much of trend. With tweets collected over a longer time period we might see a stronger trend.
+
+```{r}
+ggplot(sentiments, aes(x=WordCount, y=SentimentGI)) + geom_point(alpha=.1) + geom_smooth()
+```
