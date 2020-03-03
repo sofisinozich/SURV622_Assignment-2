@@ -1,0 +1,44 @@
+University of Maryland
+2019-20 Men's Basketball Schedule
+
+Overall    23-6  .793
+Conference 13-5  .722
+Streak     L1
+Home       15-1
+Away       5-5
+Neutral    3-0
+
+Date           Time         At        Opponent                          Location               Tournament   Result 
+Nov 1 (Fri)    7:30 p.m.    Home      Fayetteville State (Exhibition)   XFINITY Center                      W 76-43
+Nov 5 (Tue)    7:30 p.m.    Home      Holy Cross                        XFINITY Center                      W 95-71
+Nov 9 (Sat)    9:00 p.m.    Home      Rhode Island                      XFINITY Center                      W 73-55
+Nov 16 (Sat)   Noon         Home      Oakland                           XFINITY Center                      W 80-50
+Nov 19 (Tue)   8:30 p.m.    Home      Fairfield                         XFINITY Center                      W 74-55
+Nov 22 (Fri)   7:00 p.m.    Home      George Mason                      XFINITY Center                      W 86-63
+Nov 28 (Thu)   11:00 a.m.   Neutral   Temple                            Orlando, FL                         W 76-69
+Nov 29 (Fri)   11:30 AM     Neutral   Harvard University                Orlando, FL                         W 80-73
+Dec 1 (Sun)    1:00 PM      Neutral   Marquette                         Orlando, FL                         W 84-63
+Dec 4 (Wed)    7:30 p.m.    Home      Notre Dame                        XFINITY Center                      W 72-51
+Dec 7 (Sat)    5:00 p.m.    Home      Illinois                          XFINITY Center                      W 59-58
+Dec 10 (Tue)   7:00 p.m.    Away      Penn State                        University Park, PA                 L 69-76
+Dec 19 (Thu)   7:00 p.m.    Away      Seton Hall                        Newark, NJ                          L 48-52
+Dec 29 (Sun)   Noon         Home      Bryant                            XFINITY Center                      W 84-70
+Jan 4 (Sat)    Noon         Home      Indiana                           XFINITY Center                      W 75-59
+Jan 7 (Tue)    7:00 p.m.    Home      #11 Ohio State                    XFINITY Center                      W 67-55
+Jan 10 (Fri)   7:00 p.m.    Away      Iowa                              Iowa City, IA                       L 49-67
+Jan 14 (Tue)   9:00 p.m.    Away      Wisconsin                         Madison, WI                         L 54-56
+Jan 18 (Sat)   2:00 p.m.    Home      Purdue                            XFINITY Center                      W 57-50
+Jan 21 (Tue)   7:00 p.m.    Away      Northwestern                      Evanston, IL                        W 77-66
+Jan 26 (Sun)   1:00 p.m.    Away      Indiana                           Bloomington, IN                     W 77-76
+Jan 30 (Thu)   8:30 p.m.    Home      #18 Iowa                          XFINITY Center                      W 82-72
+Feb 4 (Tue)    7:00 p.m.    Home      Rutgers                           XFINITY Center                      W 56-51
+Feb 7 (Fri)    8:00 pm      Away      #20 Illinois                      Urbana-Champaign, IL                W 75-66
+Feb 11 (Tue)   8:30 p.m.    Home      Nebraska                          XFINITY Center                      W 72-70
+Feb 15 (Sat)   6:00 p.m.    Away      Michigan State                    East Lansing, MI                    W 67-60
+Feb 18 (Tue)   8:00 p.m.    Home      Northwestern                      XFINITY Center                      W 76-67
+Feb 23 (Sun)   4:00 p.m.    Away      #25 Ohio State                    Columbus, OH                        L 72-79
+Feb 26 (Wed)   9:00 p.m.    Away      Minnesota                         Minneapolis, MN                     W 74-73
+Feb 29 (Sat)   8:00 p.m.    Home      Michigan State                    XFINITY Center                      L 66-78
+Mar 3 (Tue)    7:00 p.m.    Away      Rutgers                           Piscataway, NJ                             
+Mar 8 (Sun)    Noon         Home      Michigan                          XFINITY Center                             
+Mar 11 (Wed)   TBA          Neutral   Big Ten Tournament                Indianapolis, Ind.
