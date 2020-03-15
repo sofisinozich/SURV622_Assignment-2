@@ -3,6 +3,7 @@ library(tidyverse)
 library(magrittr)
 library(quanteda)
 library(ggplot2)
+library(lubridate)
 
 # Don't do this again unless something is wrong with the tokenized tweets!
 # Concatenate all the streamed tweets
@@ -31,3 +32,19 @@ maryland_tweets %<>%
   mutate(irrelevance = ifelse((c("women's","womens") %>% intersect(.,tokenized) %>% length>0) & (c("mens","men's") %>% intersect(.,tokenized) %>% length==0), irrelevance+1,irrelevance))
 
 relevant_tweets <- maryland_tweets %>% filter(irrelevance == 0)
+
+relevant_tweets %<>% mutate(created_at_eastern = created_at %>% with_tz("America/New_York"))
+
+
+# Plots -------------------------------------------------------------------
+
+ggplot(data=relevant_tweets)+ geom_bar(aes(x=as_date(created_at_eastern)),stat="count") + 
+  scale_x_date(date_breaks = "1 day", date_labels = "%b %d") +
+  annotate("text",y=5000, x=as.Date("2020-03-11"), label = "← 3/8 Michigan @ Maryland")+
+  annotate("text",y=3000, x=as.Date("2020-03-02"), label = "↓ 2/29 Michigan State @ Maryland")+
+  annotate("text",y=1000, x=as.Date("2020-03-03"), label = "↓ No data collected ~3/2-3/4\nincludes UMD @ Rutgers", size = 3) +
+  annotate("text",y=1500, x=as.Date("2020-03-12"), label = "↓ Apparent disconnect 3/11", size=3) +
+  labs(x="Date",y="Relevant tweets collected")
+
+ggplot(data=relevant_tweets %>% mutate(hours = created_at_eastern %>% hour))+
+  geom_line(aes(x=hours), stat="count")
