@@ -5,6 +5,8 @@ library(quanteda)
 library(ggplot2)
 library(lubridate)
 
+source("Scripts/load_dataviz_themes.R")
+
 # Import a table of events that can be used for contextualizing analysis
 # (e.g. timing of press release cancelling the Big Ten tournament)
   contextual_events <- read_csv("data/contextual-events-timeline.csv") %>%
@@ -45,11 +47,11 @@ relevant_tweets %<>% mutate(created_at_eastern = created_at %>% with_tz("America
 
 ggplot(data=relevant_tweets)+ geom_bar(aes(x=as_date(created_at_eastern)),stat="count") + 
   scale_x_date(date_breaks = "1 day", date_labels = "%b %d") +
-  annotate("text",y=5000, x=as.Date("2020-03-11"), label = "← 3/8 Michigan @ Maryland")+
-  annotate("text",y=3000, x=as.Date("2020-03-02"), label = "↓ 2/29 Michigan State @ Maryland")+
+  annotate("text",y=5000, x=as.Date("2020-03-11"), label = "← 3/8 Michigan @ Maryland") +
+  annotate("text",y=3000, x=as.Date("2020-03-02"), label = "↓ 2/29 Michigan State @ Maryland") +
   annotate("text",y=1000, x=as.Date("2020-03-03"), label = "↓ No data collected ~3/2-3/4\nincludes UMD @ Rutgers", size = 3) +
   annotate("text",y=1500, x=as.Date("2020-03-12"), label = "↓ Apparent disconnect 3/11", size=3) +
-  labs(x="Date",y="Relevant tweets collected")
+  labs(x="Date",y="Relevant tweets\ncollected")
 
 ggplot(data=relevant_tweets %>% mutate(hours = created_at_eastern %>% hour))+
   geom_line(aes(x=hours), stat="count")
