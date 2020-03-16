@@ -64,6 +64,8 @@ ggplot(data=relevant_tweets %>% mutate(hours = created_at_eastern %>% hour))+
     geom_line(stat="count") +
     lemon::facet_rep_wrap(~ day_of_week, repeat.tick.labels = 'x') +
     scale_x_continuous(breaks = seq(0, 24, 4)) +
-    labs(title = "Tweets by day of week and time of day",
-         x = "Time of Day",
-         y = "# of tweets\ncreated")
+    labs(
+      title = "Tweets by day of week and time of day",
+      x = "Time of Day",
+      y = "# of tweets\ncreated"
+    )
