@@ -46,7 +46,7 @@ relevant_tweets %<>% mutate(created_at_eastern = created_at %>% with_tz("America
 # Plots -------------------------------------------------------------------
 
 ggplot(data=relevant_tweets)+ geom_bar(aes(x=as_date(created_at_eastern)),stat="count") + 
-  scale_x_date(date_breaks = "1 day", date_labels = "%b %d") +
+  scale_x_date(date_breaks = "1 day", date_labels = "%b %d\n%a") +
   annotate("text",y=5000, x=as.Date("2020-03-11"), label = "← 3/8 Michigan @ Maryland") +
   annotate("text",y=3000, x=as.Date("2020-03-02"), label = "↓ 2/29 Michigan State @ Maryland") +
   annotate("text",y=1000, x=as.Date("2020-03-03"), label = "↓ No data collected ~3/2-3/4\nincludes UMD @ Rutgers", size = 3) +
@@ -55,3 +55,15 @@ ggplot(data=relevant_tweets)+ geom_bar(aes(x=as_date(created_at_eastern)),stat="
 
 ggplot(data=relevant_tweets %>% mutate(hours = created_at_eastern %>% hour))+
   geom_line(aes(x=hours), stat="count")
+
+# Tweets by day of week and time of day
+  relevant_tweets %>%
+    mutate(hours = hour(created_at_eastern),
+           day_of_week = wday(created_at_eastern, label = TRUE, abbr = FALSE)) %>%
+    ggplot(aes(x = hours))+
+    geom_line(stat="count") +
+    lemon::facet_rep_wrap(~ day_of_week, repeat.tick.labels = 'x') +
+    scale_x_continuous(breaks = seq(0, 24, 4)) +
+    labs(title = "Tweets by day of week and time of day",
+         x = "Time of Day",
+         y = "# of tweets\ncreated")
