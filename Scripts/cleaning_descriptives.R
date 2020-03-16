@@ -59,11 +59,17 @@ ggplot(data=relevant_tweets %>% mutate(hours = created_at_eastern %>% hour))+
 # Tweets by day of week and time of day
   relevant_tweets %>%
     mutate(hours = hour(created_at_eastern),
-           day_of_week = wday(created_at_eastern, label = TRUE, abbr = FALSE)) %>%
+           day_of_week = wday(created_at_eastern, label = TRUE, abbr = FALSE),
+           is_game_day = case_when(
+             as.character(date(created_at_eastern)) %in% c("2020-02-29", "2020-03-03", "2020-03-08") ~ "Game day",
+             TRUE ~ "Non-game day"
+           )) %>%
     ggplot(aes(x = hours))+
-    geom_line(stat="count") +
+    geom_line(aes(color = is_game_day), stat="count") +
     lemon::facet_rep_wrap(~ day_of_week, repeat.tick.labels = 'x') +
     scale_x_continuous(breaks = seq(0, 24, 4)) +
+    scale_color_manual(name = "Type of day",
+                       values = c("Game day" = .maryland_red, "Non-game day" = 'gray34')) +
     labs(
       title = "Tweets by day of week and time of day",
       x = "Time of Day",
