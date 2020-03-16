@@ -7,10 +7,6 @@ library(lubridate)
 
 source("Scripts/load_dataviz_themes.R")
 
-# Import a table of events that can be used for contextualizing analysis
-# (e.g. timing of press release cancelling the Big Ten tournament)
-  contextual_events <- read_csv("data/contextual-events-timeline.csv") %>%
-    mutate(Time = ymd_hms(Time, tz = "America/New_York"))
 
 # Don't do this again unless something is wrong with the tokenized tweets!
 # Concatenate all the streamed tweets
