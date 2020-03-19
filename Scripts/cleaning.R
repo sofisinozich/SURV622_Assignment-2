@@ -20,9 +20,9 @@ source("Scripts/load_dataviz_themes.R")
 # 
 # maryland_tweets <- bind_rows(ss1_tweets,bs_tweets,rj1_tweets,rj2_tweets,rj3_tweets,ss2_tweets,.id="session") %>% distinct(status_id,.keep_all = TRUE)
 # maryland_tweets %<>%
-#   mutate(tokenized = map(text,function(x) x %>% tolower %>% tokens %>% pluck(1)))
-# 
-# write_rds(maryland_tweets, "Data/tokenized_tweets.rds")
+#   mutate(tokenized = map(text,function(x) x %>% tolower %>% tokens))
+
+write_rds(maryland_tweets, "Data/tokenized_tweets.rds")
 
 maryland_tweets <- read_rds("Data/tokenized_tweets.rds")
 
@@ -30,11 +30,9 @@ maryland_tweets <- read_rds("Data/tokenized_tweets.rds")
 
 irrelevant <- read_csv("Data/irrelevant.csv",col_names=FALSE) %>% pull
 
-maryland_tweets %<>% rowwise %>% mutate(irrelevance=tokenized %>% intersect(.,irrelevant) %>% length)
-maryland_tweets %<>%    
-  mutate(irrelevance = ifelse((c("women's","womens") %>% intersect(.,tokenized) %>% length>0) & (c("mens","men's") %>% intersect(.,tokenized) %>% length==0), irrelevance+1,irrelevance))
+maryland_tweets %<>% mutate(irrelevance = grepl(paste0(irrelevant,collapse="|"),text) | (grepl("women's|womens",text) & !grepl("\\bmen's|\\bmens",text)))
 
-relevant_tweets <- maryland_tweets %>% filter(irrelevance == 0)
+relevant_tweets <- maryland_tweets %>% filter(irrelevance == FALSE)
 
 relevant_tweets %<>% mutate(created_at_eastern = created_at %>% with_tz("America/New_York"))
 
