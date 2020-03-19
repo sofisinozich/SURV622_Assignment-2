@@ -22,7 +22,7 @@ source("Scripts/load_dataviz_themes.R")
 # maryland_tweets %<>%
 #   mutate(tokenized = map(text,function(x) x %>% tolower %>% tokens))
 
-write_rds(maryland_tweets, "Data/tokenized_tweets.rds")
+# write_rds(maryland_tweets, "Data/tokenized_tweets.rds")
 
 maryland_tweets <- read_rds("Data/tokenized_tweets.rds")
 
@@ -30,7 +30,7 @@ maryland_tweets <- read_rds("Data/tokenized_tweets.rds")
 
 irrelevant <- read_csv("Data/irrelevant.csv",col_names=FALSE) %>% pull
 
-maryland_tweets %<>% mutate(irrelevance = grepl(paste0(irrelevant,collapse="|"),text) | (grepl("women's|womens",text) & !grepl("\\bmen's|\\bmens",text)))
+maryland_tweets %<>% mutate(irrelevance = grepl(paste0(irrelevant,collapse="|"),text %>% tolower) | (grepl("women's|womens",text %>% tolower) & !grepl("\\bmen's|\\bmens",text %>% tolower)))
 
 relevant_tweets <- maryland_tweets %>% filter(irrelevance == FALSE)
 
