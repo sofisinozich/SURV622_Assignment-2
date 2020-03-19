@@ -24,7 +24,7 @@ source("Scripts/load_dataviz_themes.R")
 
 # write_rds(maryland_tweets, "Data/tokenized_tweets.rds")
 
-maryland_tweets <- read_rds("Data/tokenized_tweets.rds")
+maryland_tweets <- read_rds("Data/tokenized_tweets.rds") %>% ungroup()
 
 # Filter irrelevant tweets
 
