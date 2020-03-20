@@ -1,3 +1,6 @@
+#Install qdap
+install.packages(qdap)
+
 # Load data, packages, and any necessary functions
 library(rtweet)
 library(tidyverse)
@@ -5,10 +8,15 @@ library(magrittr)
 library(quanteda)
 library(ggplot2)
 library(lubridate)
+library(qdap)
 
 source("Scripts/load_dataviz_themes.R")
 
 relevant_tweets <- readRDS("Data/tokenized_relevant_tweets.rds")
+
+# Identify most frequent words. Are any irrelevant?
+frequent_terms = freq_terms(relevant_tweets["text"], 30)
+plot(frequent_terms)
 
 # Import a table of events that can be used for contextualizing analysis
 # (e.g. timing of press release cancelling the Big Ten tournament)
