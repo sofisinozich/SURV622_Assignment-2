@@ -34,7 +34,8 @@ maryland_tweets %<>% mutate(irrelevance = grepl(paste0(irrelevant,collapse="|"),
 
 relevant_tweets <- maryland_tweets %>% filter(irrelevance == FALSE)
 
-relevant_tweets %<>% mutate(created_at_eastern = created_at %>% with_tz("America/New_York"))
+relevant_tweets %<>% mutate_at(vars(matches("created_at$")),
+                               list(`eastern` = function(x) with_tz(x, "America/New_York")))
 
 # Save relevant tweets to a new RDS file
 
