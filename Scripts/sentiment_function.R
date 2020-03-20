@@ -5,6 +5,8 @@ library(magrittr)
 
 data_dictionary_emoji <- dictionary(file = "Data/emoji_dictionary.txt",format="YAML",tolower=FALSE)
 
+# Sample use: tweets %>% bind_cols(sentimenter(.))
+
 # By default, the function uses equation 2 on slide 11 of the 7b lecture (which is the default for analyzeSentiment)
 # (positives - negatives)/total
 sentimenter <- function(tweets,lexicoder=FALSE, equation=2, emoji=FALSE) {
@@ -12,23 +14,13 @@ sentimenter <- function(tweets,lexicoder=FALSE, equation=2, emoji=FALSE) {
   
   if (lexicoder) {
    lexicoded <- lapply(tweets$tokenized,function(x) tokens_lookup(x,dictionary = data_dictionary_LSD2015, exclusive=FALSE))
-   pos <- map_int(lexicoded,function(x) sum(x %>% pluck(1) == "POSITIVE"))
-   neg <- map_int(lexicoded,function(x) sum(x %>% pluck(1) == "NEGATIVE"))
-   negpos <- map_int(lexicoded,function(x) sum(x %>% pluck(1) == "NEG_POSITIVE"))
-   negneg <-map_int(lexicoded,function(x) sum(x %>% pluck(1) == "NEG_NEGATIVE"))
-   lcpos <- (pos-negpos+negneg)
-   lcneg <- (neg-negneg+negpos)
+   sentiment_table %<>% bind_cols(sentiment_map(lexicoded,1))
    sentiment_table %<>% mutate(SentimentLC = (lcpos-lcneg)/WordCount, NegativityLC = lcneg/WordCount, PositivityLC = lcpos/WordCount)
   }
   
   if (emoji) {
     emojified <- lapply(tweets$tokenized, function(x) tokens_lookup(x,dictionary = data_dictionary_emoji, exclusive=FALSE))
-    pos <- map_int(emojified,function(x) sum(x %>% pluck(1) == "POSITIVE"))
-    neg <- map_int(emojified,function(x) sum(x %>% pluck(1) == "NEGATIVE"))
-    negpos <- map_int(emojified,function(x) sum(x %>% pluck(1) == "NEG_POSITIVE"))
-    negneg <-map_int(emojified,function(x) sum(x %>% pluck(1) == "NEG_NEGATIVE"))
-    epos <- (pos-negpos+negneg)
-    eneg <- (neg-negneg+negpos)
+    sentiment_table %<>% bind_cols(sentiment_map(emojified,2))
     sentiment_table %<>% mutate(SentimentEmoji = (epos-eneg)/WordCount, NegativityEmoji = eneg/WordCount, PositivityEmoji = epos/WordCount)
   }
   
@@ -63,4 +55,19 @@ sentimenter <- function(tweets,lexicoder=FALSE, equation=2, emoji=FALSE) {
   }
   
   return(sentiment_table)
+}
+
+sentiment_map <- function(lookedup,use) {
+  pos <- map_int(lookedup,function(x) sum(x %>% pluck(1) == "POSITIVE"))
+  neg <- map_int(lookedup,function(x) sum(x %>% pluck(1) == "NEGATIVE"))
+  negpos <- map_int(lookedup,function(x) sum(x %>% pluck(1) == "NEG_POSITIVE"))
+  negneg <-map_int(lookedup,function(x) sum(x %>% pluck(1) == "NEG_NEGATIVE"))
+  totalpos <- (pos-negpos+negneg)
+  totalneg <- (neg-negneg+negpos)
+  if (use == 1) {
+    return(bind_cols(lcpos=totalpos,lcneg=totalneg))
+  }
+  else {
+    return(bind_cols(epos=totalpos,eneg=totalneg))
+  }
 }
