@@ -17,7 +17,11 @@ library(ggplot2)
                                       face = 'bold', size = 12,
                                       angle = 0),
             axis.title.y = element_text(angle = 0, vjust = 0.5),
-            axis.text = element_text(size = 10))
+            axis.text = element_text(size = 10),
+            strip.text = element_text(family = .font_to_use,
+                                        size = 12, angle = 0),
+            strip.text.y.left = element_text(family = .font_to_use,
+                                             size = 12, angle = 0))
   )
   
   rm(.font_to_use)
