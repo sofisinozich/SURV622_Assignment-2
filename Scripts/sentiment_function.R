@@ -13,7 +13,7 @@ data_dictionary_lcemoji <- dictionary(c(as.list(data_dictionary_emoji),as.list(d
 sentimenter <- function(tweets,equation=2) {
   tweets_text <- tweets %>% select(text) %>% pull
   tweets_tokens <- tweets_text %>% corpus %>% 
-    tokens(remove_punct = TRUE, remove_symbols=TRUE,remove_url=TRUE,remove_separators=TRUE) %>% 
+    tokens(remove_punct = TRUE,remove_url=TRUE,remove_separators=TRUE) %>% 
     tokens_remove(stopwords("english")) %>% # Remove English stopwords
     tokens_remove("^[A-z]{1}$",valuetype="regex") # Remove single-letter words
   tokens_length <- tweets_tokens %>% pluck(1) %>% length
