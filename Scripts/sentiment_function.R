@@ -20,7 +20,7 @@ sentimenter <- function(tweets,equation=2) {
     select(-lcpos,-lcneg)
   
   emoji <- tweets_tokens %>% tokens_lookup(dictionary = data_dictionary_emoji, exclusive=FALSE)
-  sentiment_table %<>% bind_cols(sentiment_map(lexicoded,2)) %>% 
+  sentiment_table %<>% bind_cols(sentiment_map(emoji,2)) %>% 
     mutate(SentimentEmoji = (epos-eneg)/WordCount, NegativityEmoji = eneg/WordCount, PositivityEmoji = epos/WordCount) %>% 
     select(-epos,-eneg)
 
