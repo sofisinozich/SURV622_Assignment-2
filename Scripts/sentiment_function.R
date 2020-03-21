@@ -16,8 +16,8 @@ sentimenter <- function(tweets,equation=2) {
     tokens(remove_punct = TRUE,remove_url=TRUE,remove_separators=TRUE) %>% 
     tokens_remove(stopwords("english")) %>% # Remove English stopwords
     tokens_remove("^[A-z]{1}$",valuetype="regex") # Remove single-letter words
-  tokens_length <- tweets_tokens %>% pluck(1) %>% length
-  sentiment_table <- tweets_text %>% iconv(.,to="UTF-8") %>% analyzeSentiment(.)
+  tokens_length <- tweets_tokens %>% map_int(.,function(x) length(x))
+  sentiment_table <- tweets_text %>% iconv(.,to="UTF-8") %>% analyzeSentiment(.) %>% mutate(TokensCount = tokens_length)
   
   lexicoded <- tweets_tokens %>% tokens_lookup(dictionary = data_dictionary_LSD2015, exclusive=FALSE)
   sentiment_table %<>% bind_cols(sentiment_map(lexicoded,1)) %>% 
