@@ -15,18 +15,52 @@ source("Scripts/load_dataviz_themes.R")
 relevant_tweets <- readRDS("Data/tokenized_relevant_tweets.rds")
 
 # Identify most frequent words. Are any irrelevant?
-frequent_terms = freq_terms(relevant_tweets["text"], 30)
-plot(frequent_terms)
+frequent_terms_raw = freq_terms(relevant_tweets["text"], 30)
+plot(frequent_terms_raw)
 
 bagRelevant = relevant_tweets$text %>% 
   iconv("latin1", "ASCII", sub="") %>% 
   scrubber() %sw% 
   qdapDictionaries::Top200Words
 
-frequent_terms = freq_terms(bagRelevant, 30, stopwords = c("t", "co", "https", "b", "d", "g", "amp"))
-plot(frequent_terms)
+frequent_terms_clean = freq_terms(bagRelevant, 30, stopwords = c("t", "co", "https", "b", "d", "g", "amp"))
+plot(frequent_terms_clean)
 
 # Note: "umdwbb" (related to women's basketball) is in the top 30 words. Need to add this to the irrelevant term list.
+
+# Identify most frequent words before and after cancellation announced
+
+relevant_tweets1 <- relevant_tweets %>%
+  mutate(hours = hour(created_at_eastern),
+         date = date(created_at_eastern)) %>%
+  filter(date < as.Date("2020-03-12"))
+
+frequent_terms_raw1 = freq_terms(relevant_tweets1["text"], 30)
+plot(frequent_terms_raw1)
+
+bagRelevant1 = relevant_tweets1$text %>% 
+  iconv("latin1", "ASCII", sub="") %>% 
+  scrubber() %sw% 
+  qdapDictionaries::Top200Words
+
+frequent_terms_clean1 = freq_terms(bagRelevant1, 30, stopwords = c("t", "co", "https", "b", "d", "g", "amp"))
+plot(frequent_terms_clean1)
+
+relevant_tweets2 <- relevant_tweets %>%
+  mutate(hours = hour(created_at_eastern),
+         date = date(created_at_eastern)) %>%
+  filter(date >= as.Date("2020-03-12"))
+
+frequent_terms_raw2 = freq_terms(relevant_tweets2["text"], 30)
+plot(frequent_terms_raw2)
+
+bagRelevant2 = relevant_tweets2$text %>% 
+  iconv("latin1", "ASCII", sub="") %>% 
+  scrubber() %sw% 
+  qdapDictionaries::Top200Words
+
+frequent_terms_clean2 = freq_terms(bagRelevant2, 30, stopwords = c("t", "co", "https", "b", "d", "g", "amp"))
+plot(frequent_terms_clean2)
 
 # Import a table of events that can be used for contextualizing analysis
 # (e.g. timing of press release cancelling the Big Ten tournament)
