@@ -136,8 +136,10 @@ plot(frequent_terms_clean2)
       count(half_hour, name = 'Tweets', .drop = FALSE) %>%
       ggplot(aes(x = half_hour, y = Tweets)) +
       geom_col(color = 'white') +
-      annotate(geom = 'text', y = 95, x = "11:30",
+      annotate(geom = 'text', y = 95, x = "11:30", size = 3,
                label = "Big Ten Tournament\nCancellation Announced\nat 11:45 am\n↓") +
+      annotate(geom = 'text', y = 120, x = "20:30",
+               label = "UMD Coach Turgeon →\nappears on ESPN\nat 22:30", size = 3) +
       annotate(geom = 'text', y = 30, x = "19:00",
                label = "      Apparent\n      streaming\n      disconnect", size = 3) +
       coord_cartesian(expand = c(0,0)) +
@@ -151,8 +153,8 @@ plot(frequent_terms_clean2)
         )
       ) +
       labs(
-        title = paste(c("When the Big Ten Conference announced the tournament's cancellation at 11:45am on March 12,",
-                      glue::glue("the number of tweets increased by {100*((tweets_in_announcement_block/tweets_in_preceding_block)-1)}%.")),
+        title = paste(c("When the Big Ten Conference announced the tournament's cancellation on March 12,",
+                      "tweet activity increased around the 11:45 announcement and the 22:30 ESPN interview of Coach Turgeon."),
                       collapse = "\n")
       )
     
