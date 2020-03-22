@@ -67,8 +67,16 @@ plot(frequent_terms_clean2)
   contextual_events <- read_csv("data/contextual-events-timeline.csv") %>%
     mutate(Time = ymd_hms(Time, tz = "America/New_York"))
 
-# Plots -------------------------------------------------------------------
-
+# Tweet frequency  -------------------------------------------------------------------
+  
+  tweets_by_time %>%
+    count(date = date(created_at_eastern)) %>%
+    mutate(pct = n/sum(n))
+  
+  tweets_by_time %>%
+    count(is_game_day) %>%
+    mutate(pct = n/sum(n))
+  
 # Summary of results from streaming, with annotations for important events and gaps
   ggplot(data=relevant_tweets)+ geom_bar(aes(x=as_date(created_at_eastern)),stat="count") + 
     scale_x_date(date_breaks = "1 day", date_labels = "%b %d\n%a") +
@@ -120,6 +128,8 @@ plot(frequent_terms_clean2)
           factor(levels = map(0:23, ~ paste0(.x, c(":00", ":30"))) %>% unlist())
       )
   
+  #_ Analyze number of tweets from game days vs other days
+  
   ##__ Day of Big Ten cancellation
     tweets_in_announcement_block <- tweets_by_time %>%
       filter(date == "Mar 12") %>%
@@ -167,7 +177,13 @@ plot(frequent_terms_clean2)
                                                  "Thursday", "Friday", "Saturday"))) %>%
       ggplot(aes(x = half_hour, y = Tweets)) +
       lemon::facet_rep_grid(week_index ~ day_of_week, repeat.tick.labels = 'x',
-                            switch = 'y', drop = FALSE) +
+                            switch = 'y', drop = FALSE,
+                            labeller = as_labeller(function(x) {
+                              case_when(x == "Week 1" ~ "Feb. 23 - 29",
+                                        x == "Week 2" ~ "Mar. 1 - 7",
+                                        x == "Week 3" ~ "Mar. 8 - 14",
+                                        TRUE ~ x)
+                            })) +
       geom_col(aes(fill = is_game_day, color = is_game_day)) +
       # Grey out entire days without data collection
       geom_rect(data = tibble(
