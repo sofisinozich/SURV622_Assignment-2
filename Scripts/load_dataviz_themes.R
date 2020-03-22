@@ -21,7 +21,15 @@ library(ggplot2)
             strip.text = element_text(family = .font_to_use,
                                         size = 12, angle = 0),
             strip.text.y.left = element_text(family = .font_to_use,
-                                             size = 12, angle = 0))
+                                             size = 12, angle = 0),
+            strip.placement = 'outside',
+            legend.position = "top",
+            legend.justification = c(0, 0),
+            legend.text = ggplot2::element_text(size = (0.8)*12, colour = "#545454",
+                                                family = .font_to_use),
+            legend.background = ggplot2::element_blank(),
+            legend.key = ggplot2::element_rect(size = 0.5, colour = NA),
+            )
   )
   
   rm(.font_to_use)
