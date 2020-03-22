@@ -1,3 +1,10 @@
+library(rtweet)
+library(tidyverse)
+library(magrittr)
+library(quanteda)
+library(ggplot2)
+library(lubridate)
+
 # Irrelevant (IF "Not Basketball" irrelevant words AND NOT "basketball | bball | hoops" OR (IF "Not Men's" irrelevant words AND NOT "men | men's | mbb")
 
 irrelevant2 <- read_csv("Data/irrelevant2.csv",col_names=TRUE)
@@ -10,7 +17,7 @@ newTweets = data.frame()
 irrelevantTweets = data.frame()
 
 for(i in 1:nrow(relevant_tweets)){
-  # break up tweet into indiviaul words
+  # break up tweet into individual words
   tweet = relevant_tweets$text[i]
   tweet = tolower(tweet)
   words = tokens(tweet)
