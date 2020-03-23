@@ -69,6 +69,29 @@ plot(frequent_terms_clean2)
 
 # Tweet frequency  -------------------------------------------------------------------
   
+  #_ Obtain counts of tweets by half-hour increments on key dates ----
+  
+  tweets_by_time <- relevant_tweets %>%
+    mutate(
+      week_index = case_when(
+        month(created_at_eastern) == 2 ~ "Week 1",
+        month(created_at_eastern) == 3 & day(created_at_eastern) <= 7 ~ "Week 2",
+        TRUE ~ "Week 3"
+      ),
+      date = paste0(month(created_at_eastern, label = TRUE), " ", day(created_at_eastern)),
+      day_of_week = wday(created_at_eastern, label = TRUE, abbr = FALSE) %>%
+        as.character(),
+      is_game_day = case_when(
+        as.character(date(created_at_eastern)) %in% c("2020-02-29", "2020-03-03", "2020-03-08") ~ "Game day",
+        TRUE ~ "Non-game day"
+      ),
+      half_hour = paste0(hour(created_at_eastern),
+                         ifelse(minute(created_at_eastern) < 30, ":00", ":30")
+      ) %>%
+        factor(levels = map(0:23, ~ paste0(.x, c(":00", ":30"))) %>% unlist())
+    )
+  
+  #_ Summarize tweet volume by day ----
   tweets_by_time %>%
     count(date = date(created_at_eastern)) %>%
     mutate(pct = n/sum(n))
@@ -77,7 +100,7 @@ plot(frequent_terms_clean2)
     count(is_game_day) %>%
     mutate(pct = n/sum(n))
   
-# Summary of results from streaming, with annotations for important events and gaps
+# Plot summary of results from streaming, with annotations for important events and gaps
   ggplot(data=relevant_tweets)+ geom_bar(aes(x=as_date(created_at_eastern)),stat="count") + 
     scale_x_date(date_breaks = "1 day", date_labels = "%b %d\n%a") +
     annotate("text",y=5000, x=as.Date("2020-03-11"), label = "← 3/8 Michigan @ Maryland") +
@@ -86,7 +109,7 @@ plot(frequent_terms_clean2)
     annotate("text",y=1500, x=as.Date("2020-03-12"), label = "↓ Apparent disconnect 3/11", size=3) +
     labs(x="Date",y="Relevant tweets\ncollected")
 
-# Tweets by day of week and time of day
+# Plot tweets by day of week and time of day
   relevant_tweets %>%
     mutate(hours = hour(created_at_eastern),
            day_of_week = wday(created_at_eastern, label = TRUE, abbr = FALSE),
@@ -105,28 +128,6 @@ plot(frequent_terms_clean2)
       x = "Time of Day",
       y = "# of tweets\ncreated"
     )
-  
-  #_ Tweets by half-hour increments on key dates ----
-  
-    tweets_by_time <- relevant_tweets %>%
-      mutate(
-        week_index = case_when(
-          month(created_at_eastern) == 2 ~ "Week 1",
-          month(created_at_eastern) == 3 & day(created_at_eastern) <= 7 ~ "Week 2",
-          TRUE ~ "Week 3"
-        ),
-        date = paste0(month(created_at_eastern, label = TRUE), " ", day(created_at_eastern)),
-        day_of_week = wday(created_at_eastern, label = TRUE, abbr = FALSE) %>%
-          as.character(),
-        is_game_day = case_when(
-          as.character(date(created_at_eastern)) %in% c("2020-02-29", "2020-03-03", "2020-03-08") ~ "Game day",
-          TRUE ~ "Non-game day"
-        ),
-        half_hour = paste0(hour(created_at_eastern),
-                           ifelse(minute(created_at_eastern) < 30, ":00", ":30")
-        ) %>%
-          factor(levels = map(0:23, ~ paste0(.x, c(":00", ":30"))) %>% unlist())
-      )
   
   #_ Analyze number of tweets from game days vs other days
   
