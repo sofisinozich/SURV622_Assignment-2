@@ -22,6 +22,8 @@ library(ggplot2)
                                         size = 12, angle = 0),
             strip.text.y.left = element_text(family = .font_to_use,
                                              size = 12, angle = 0),
+            strip.text.x = element_text(family = .font_to_use,
+                                        size=12, angle=0, face= "bold"),
             strip.placement = 'outside',
             legend.position = "top",
             legend.justification = c(0, 0),

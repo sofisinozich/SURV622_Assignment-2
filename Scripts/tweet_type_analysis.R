@@ -23,9 +23,11 @@ relevant_tweets_sentiment %>%
 
 # Density plots
 density_plain <- ggplot(relevant_tweets_sentiment,aes(x=SentimentGI)) + 
-  geom_density(alpha=.5, position="identity") + ggtitle("All tweets")
+  geom_density(alpha=.5, position="identity") + ggtitle("All tweets")+ylab("Density")
 density_overlay <- ggplot(relevant_tweets_sentiment,aes(x=SentimentGI,fill=tweet_type)) + 
-  geom_density(alpha=.5, position="identity")
+  geom_density(alpha=.5, position="identity") +
+  ylab("") +
+  theme(legend.title = element_blank())
 # ggsave("Plots/density_tweet_type_overlay.png",density_overlay)
 
 density3 <- relevant_tweets_sentiment %>% group_by(tweet_type) %>% 
@@ -36,6 +38,7 @@ density3 <- relevant_tweets_sentiment %>% group_by(tweet_type) %>%
   geom_vline(aes(xintercept=SentimentGI_median), color = "blue") +
   geom_text(data= . %>% slice(1), aes(label = paste0("mean: ",round(SentimentGI_mean,2)), x = SentimentGI_mean + 0.25), y = 4,color = "red") +
   geom_text(data= . %>% slice(1), aes(label = paste0("median: ",round(SentimentGI_median,2)), x = SentimentGI_median -0.25), y = 6,  color = "blue") +
+  ylab("Density")+
   facet_grid(tweet_type~.) 
 # ggsave("Plots/density_tweet_type3.png",density3)
 
@@ -47,8 +50,8 @@ frequency3 <- relevant_tweets_sentiment %>% mutate(sentiment_category = case_whe
   filter(!is.na(sentiment_category)) %>% 
   ggplot() + geom_bar(aes(x=sentiment_category,y=n),stat="identity") + 
   geom_text(aes(x=sentiment_category,y=n+100,label=paste0(n," (",round(percent,2)*100,"%)")))+
+  xlab("Sentiment Category") + ylab("Count")+
   facet_wrap(.~tweet_type)
-
 # ggsave("Plots/frequency_tweet_type3.png",frequency3)
 
 
@@ -133,13 +136,15 @@ quote_tweets <- relevant_tweets_sentiment %>%
 summary(quote_tweets$SentimentGI)
 qrts_raw <- ggplot(quote_tweets,aes(x=SentimentGI)) + 
   geom_density(alpha=.5, position="identity")+
-  ggtitle("All quoted tweets")
+  ggtitle("All quoted tweets")+
+  ylab("")
 
 # Unique only
 summary(quote_tweets %>% distinct(quoted_status_id,.keep_all=TRUE) %>% select(SentimentGI))
 qrts_unique <- quote_tweets %>% distinct(quoted_status_id,.keep_all=TRUE) %>% select(SentimentGI) %>% 
   ggplot(aes(x=SentimentGI)) + 
   geom_density(alpha=.5, position="identity") +
+  ylab("")+
   ggtitle("Unique quoted tweets")
 
 ggsave("Plots/density_qrts.png",grid.arrange(density_plain,qrts_raw,qrts_unique,ncol=3))
@@ -156,9 +161,9 @@ density_textquote<-quote_tweets %>%
   select(text=text.y,textsentiment=SentimentGI,quoted=text.x,quotedsentiment=SentimentGI1,quotedauthor = quoted_screen_name) %>% 
   ggplot() +
   geom_density(aes(x=textsentiment,fill="Text"),alpha=.5) +
-  geom_density(aes(x=quotedsentiment,fill="Quoted"),alpha=.5)+
-  xlab("Sentiment")+
-  scale_fill_discrete(name = "Sentiment")
+  geom_density(aes(x=quotedsentiment,fill="Quoted text"),alpha=.5)+
+  xlab("Sentiment")+ylab("Density")+
+  theme(legend.title = element_blank())
 # ggsave("Plots/density_text_quoted.png",density_textquote)
 
 # check with LCE
@@ -175,10 +180,14 @@ quote_tweets %>%
 textvquotedsentiment <- quote_tweets %>% 
   left_join(relevant_tweets_sentiment %>% filter(is_quote & !is_retweet) %>% select(text,status_id), by=c("status_id")) %>% 
   select(text=text.y,textsentiment=SentimentGI,quoted=text.x,quotedsentiment=SentimentGI1,quotedauthor = quoted_screen_name) %>% 
+  mutate(terphoops = case_when(quotedauthor == "TerrapinHoops"~"Quote by @TerrapinHoops",TRUE ~ "All others")) %>% 
   ggplot() +
-  geom_point(aes(x=quotedsentiment,y=textsentiment)) +
-  geom_point(data = . %>% filter(quotedauthor == "TerrapinHoops"),aes(x=quotedsentiment,y=textsentiment), color = "red")
-# ggsave("Plots/text_quoted_sentiment_scatter.png",textvquotedsentiment)
+  geom_point(aes(x=quotedsentiment,y=textsentiment,color=terphoops)) +
+  xlab("Quoted text sentiment") + ylab("Text sentiment")+
+  scale_color_manual(values=c(.maryland_red,"black"))+
+  theme(legend.title = element_blank())+
+  guides(color = guide_legend(reverse=TRUE))
+ggsave("Plots/text_quoted_sentiment_scatter.png",textvquotedsentiment)
 
 # Mean/median reaction to most popular
 quote_tweets %>% 
