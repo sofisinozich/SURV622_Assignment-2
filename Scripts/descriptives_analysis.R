@@ -218,6 +218,21 @@ plot(frequent_terms_clean2)
         xmax = factor("16:30", levels(tweets_by_time$half_hour)),
         ymin = -Inf, ymax = Inf,
         fill = 'lightgray', alpha = 0.75) +
+        #_ March 5: 0:00 through 9:52
+        geom_rect(data = tibble(
+          day_of_week = factor(c("Thursday"),
+                               c("Sunday", "Monday", "Tuesday", "Wednesday",
+                                 "Thursday", "Friday", "Saturday")),
+          is_game_day = c("Non-game day"),
+          week_index = c("Week 2"),
+          half_hour = factor(rep("0:00", times = 1),
+                             levels(tweets_by_time$half_hour)),
+          Tweets = rep(NA_integer_)
+        ),
+        xmin = factor("0:00", levels(tweets_by_time$half_hour)),
+        xmax = factor("9:00", levels(tweets_by_time$half_hour)),
+        ymin = -Inf, ymax = Inf,
+        fill = 'lightgray', alpha = 0.75) +
         #_ March 9: 9:00 through 22:30
         geom_rect(data = tibble(
           day_of_week = factor(c("Monday"),
@@ -271,7 +286,7 @@ plot(frequent_terms_clean2)
                                              "Thursday", "Friday", "Saturday")),
           is_game_day = "Game day",
           week_index = "Week 1",
-        ), y = 300, label = "Michigan State\nStarts at 20:00") +
+        ), y = 300, label = "Michigan State\nStarts at 20:00", size = 2.75) +
         #_ Second game (Mar 8)
         geom_text(data = tibble(
           half_hour = "6:30",
@@ -279,7 +294,7 @@ plot(frequent_terms_clean2)
                                            "Thursday", "Friday", "Saturday")),
           is_game_day = "Game day",
           week_index = "Week 3",
-        ), y = 450, label = "Michigan\nStarts at noon") +
+        ), y = 450, label = "Michigan\nStarts at noon", size = 2.75) +
         #_ Tournament cancellation
         geom_text(data = tibble(
           half_hour = "11:30",
@@ -287,7 +302,8 @@ plot(frequent_terms_clean2)
                                              "Thursday", "Friday", "Saturday")),
           is_game_day = "Non-game day",
           week_index = "Week 3",
-        ), y = 300, label = "Big Ten\nTournament\nCancelled\n↓") +
+        ), y = 300, label = "Big Ten\nTournament\nCancelled\n↓", size = 2.75) +
+      coord_cartesian(clip = 'off') +
       # Add scales and titles
       scale_x_discrete(name = "Time of Day (in half hour increments)",
                        breaks = levels(tweets_by_time$half_hour),
@@ -303,3 +319,7 @@ plot(frequent_terms_clean2)
         subtitle = "Number of tweets by day and time of day",
         title = "The volume of tweets is vastly larger on game days.\nEven on the day of the Big Ten Tournament's cancellation, the volume of tweets is nowhere as large as on a game day."
       )
+    
+    ggsave(filename = "Plots/Tweet_Volume_over_Time_Entire_Period.png", plot = last_plot(),
+           width = 6.5, height = 3.25, units = 'in', scale = 2,
+           dpi = 500)

@@ -98,6 +98,21 @@ library(lemon)
     xmax = factor("16:30", levels(tweets_by_time$half_hour)),
     ymin = -Inf, ymax = Inf,
     fill = 'lightgray', alpha = 0.75) +
+    #_ March 5: 0:00 through 9:52
+    geom_rect(data = tibble(
+      day_of_week = factor(c("Thursday"),
+                           c("Sunday", "Monday", "Tuesday", "Wednesday",
+                             "Thursday", "Friday", "Saturday")),
+      is_game_day = c("Non-game day"),
+      week_index = c("Week 2"),
+      half_hour = factor(rep("0:00", times = 1),
+                         levels(tweets_by_time$half_hour)),
+      average_sentiment = rep(NA_real_)
+    ),
+    xmin = factor("0:00", levels(tweets_by_time$half_hour)),
+    xmax = factor("9:00", levels(tweets_by_time$half_hour)),
+    ymin = -Inf, ymax = Inf,
+    fill = 'lightgray', alpha = 0.75) +
     #_ March 9: 9:00 through 22:30
     geom_rect(data = tibble(
       day_of_week = factor(c("Monday"),
