@@ -2,7 +2,9 @@ library(ggplot2)
 
 # Set the default theme for plots
   if ('extrafont' %in% installed.packages()) {  
-    extrafont::loadfonts(device = 'win')
+    if (Sys.info()["sysname"] == "Windows") {
+      extrafont::loadfonts(device = 'win')
+    }
     .font_to_use <- 'Arial Narrow'
   } else {
     .font_to_use <- "sans"

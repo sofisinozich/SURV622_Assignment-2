@@ -5,6 +5,9 @@ library(gridExtra)
 library(magrittr)
 library(lemon)
 
+source("Scripts/sentiment_function.R")
+source("Scripts/load_dataviz_themes.R")
+
 relevant_tweets_sentiment <- read_rds("Data/tokenized_relevant_tweets_sentiment.rds")
 
 # Categories - original, RTs (including RT'd quote RTs = is_retweet + is_quote), quote RTs
@@ -147,7 +150,7 @@ qrts_unique <- quote_tweets %>% distinct(quoted_status_id,.keep_all=TRUE) %>% se
   ylab("")+
   ggtitle("Unique quoted tweets")
 
-ggsave("Plots/density_qrts.png",grid.arrange(density_plain,qrts_raw,qrts_unique,ncol=3))
+# ggsave("Plots/density_qrts.png",grid.arrange(density_plain,qrts_raw,qrts_unique,ncol=3))
 
 # Top QRT producers
 quote_tweets %>% group_by(quoted_screen_name) %>% 
@@ -183,6 +186,7 @@ textvquotedsentiment <- quote_tweets %>%
   mutate(terphoops = case_when(quotedauthor == "TerrapinHoops"~"Quote by @TerrapinHoops",TRUE ~ "All others")) %>% 
   ggplot() +
   geom_point(aes(x=quotedsentiment,y=textsentiment,color=terphoops)) +
+  xlim(c(-1,1))+ylim(c(-1,1))+
   xlab("Quoted text sentiment") + ylab("Text sentiment")+
   scale_color_manual(values=c(.maryland_red,"black"))+
   theme(legend.title = element_blank())+
