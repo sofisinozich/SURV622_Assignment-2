@@ -1,4 +1,4 @@
-Plots to accompany our report are provided here in full resolution.
+Plots to accompany our report are provided here in full resolution. See our [full repo](https://github.com/sofisinozich/SURV622_Assignment-2) and our [report](https://github.com/sofisinozich/SURV622_Assignment-2/Exercise2Report.pdf).
 
 ### Figure 1. Volume of Tweets by Day and Time of Day
 ![](https://raw.githubusercontent.com/sofisinozich/SURV622_Assignment-2/master/Plots/Tweet_Volume_over_Time_Entire_Period.png)

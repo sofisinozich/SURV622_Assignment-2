@@ -1,10 +1,5 @@
-# SURV622_Assignment-2
+# SURV622_Assignment-2: Using the Twitter API and Sentiment Analysis of Tweets
 
-Assignment 2 from SURV622 (Twitter).
+📓 Our [full report](https://github.com/sofisinozich/SURV622_Assignment-2/Exercise2Report.pdf) and accompanying [plots at full-res](https://sofisinozich.github.io/SURV622_Assignment-2/).
 
-# Tweet streaming log
-
-|Name|Start|Runtime|File|
-|---|----|----|---|
-|Sofi|2/29 5pish|30 hours|ss_streamed_tweets|
-|Ben|3/5 10amish|74ish hours|bs_streamed_tweets_mar5-10am-mar8-1211pm|
+👩‍🎓👨‍🎓 Our group is [Rachael Jackson](https://github.com/rajackso), [Victoria Owens](https://github.com/vilaowens), [Ben Schneider](https://github.com/bschneidr), [Sofi Sinozich](https://github.com/sofisinozich)
