@@ -4,6 +4,7 @@ Plots to accompany our report are provided here in full resolution.
 ![](https://raw.githubusercontent.com/sofisinozich/SURV622_Assignment-2/master/Plots/Tweet_Volume_over_Time_Entire_Period.png)
 
 ### Figure 2. Volume of Tweets by Time of Day on March 12
+![](https://raw.githubusercontent.com/sofisinozich/SURV622_Assignment-2/master/Plots/Tweet_Volume_over_Time_March12.png)
 
 ### Figure 3. 30 Most Common Terms in Raw Tokenized Tweets
 ![](https://raw.githubusercontent.com/sofisinozich/SURV622_Assignment-2/master/Plots/Freq_Raw.jpeg)

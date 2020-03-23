@@ -169,6 +169,10 @@ plot(frequent_terms_clean2)
                       collapse = "\n")
       )
     
+    ggsave(filename = "Plots/Tweet_Volume_over_Time_March12.png", plot = last_plot(),
+           width = 6.5, height = 2.5, units = 'in', scale = 2,
+           dpi = 620)
+    
     
   # Overview plot: day of week and time of day with annotations
     tweets_by_time %>%
